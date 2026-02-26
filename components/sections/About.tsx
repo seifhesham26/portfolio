@@ -31,14 +31,14 @@ export default function About() {
               solutions.
             </p>
             <p className="text-base sm:text-lg text-muted-foreground text-center leading-relaxed mt-4">
-              My experience includes working on{" "}
+              My experience includes serving as the sole frontend owner of a{" "}
               <span className="text-foreground font-medium">
-                enterprise-grade applications
+                real estate SaaS CRM
               </span>{" "}
-              with 600+ components, real-time collaboration features, and
-              comprehensive state management. I&apos;m constantly learning and
-              staying up-to-date with the latest technologies and best
-              practices.
+              for 1,000+ active users. I specialize in building real-time
+              systems, AI-integrated property matching features, and developing
+              scalable, fully customizable platforms using Next.js and
+              TypeScript.
             </p>
           </div>
 

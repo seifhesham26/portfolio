@@ -44,11 +44,19 @@ export default function Certificates() {
                   key={index}
                   className="pl-4 basis-full sm:basis-1/2 lg:basis-1/3"
                 >
-                  <a
-                    href={cert.file}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group block h-full"
+                  <div
+                    onClick={() =>
+                      window.open(cert.file, "_blank", "noopener noreferrer")
+                    }
+                    className="group block h-full cursor-pointer"
+                    role="link"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        window.open(cert.file, "_blank", "noopener noreferrer");
+                      }
+                    }}
                   >
                     <div className="relative flex flex-col h-full min-h-[220px] p-6 rounded-2xl border border-border bg-card hover:border-foreground/30 transition-all duration-300 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/30 hover:-translate-y-1">
                       {/* Meta Logo */}
@@ -137,7 +145,7 @@ export default function Certificates() {
                         </svg>
                       </div>
                     </div>
-                  </a>
+                  </div>
                 </CarouselItem>
               ))}
             </CarouselContent>

@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { personalInfo, socialLinks } from "@/lib/data";
+import emailjs from "@emailjs/browser";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -19,12 +20,23 @@ export default function Contact() {
     setStatus("sending");
 
     try {
-      // TODO: Replace with actual EmailJS implementation
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await emailjs.send(
+        "service_7pokdov",
+        "template_hqcc2nl",
+        {
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        },
+        "-EzTsK1V2Dw-MkNfS",
+      );
+
       setStatus("success");
       setFormData({ name: "", email: "", subject: "", message: "" });
       setTimeout(() => setStatus("idle"), 3000);
-    } catch {
+    } catch (error) {
+      console.error("EmailJS Error:", error);
       setStatus("error");
       setTimeout(() => setStatus("idle"), 3000);
     }
@@ -218,7 +230,7 @@ export default function Contact() {
 
               <div className="space-y-3 sm:space-y-4">
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-muted rounded-lg flex items-center justify-center shrink-0">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="18"
@@ -246,7 +258,7 @@ export default function Contact() {
                 </div>
 
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-muted rounded-lg flex items-center justify-center shrink-0">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="18"
@@ -267,9 +279,44 @@ export default function Contact() {
                     <p className="text-xs sm:text-sm text-muted-foreground">
                       Email
                     </p>
-                    <p className="font-medium text-sm sm:text-base break-all">
+                    <a
+                      href={`mailto:${personalInfo.email}`}
+                      className="font-medium text-sm sm:text-base break-all hover:text-[#0081FB] transition-colors"
+                    >
                       {personalInfo.email}
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-muted rounded-lg flex items-center justify-center shrink-0">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="sm:w-5 sm:h-5"
+                    >
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
+                      Phone / WhatsApp
                     </p>
+                    <a
+                      href="https://wa.me/201000520888"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-sm sm:text-base break-all hover:text-[#0081FB] transition-colors"
+                    >
+                      {personalInfo.phone}
+                    </a>
                   </div>
                 </div>
               </div>
