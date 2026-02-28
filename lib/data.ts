@@ -10,7 +10,7 @@ export const personalInfo = {
 };
 
 export const socialLinks = {
-  linkedin: "https://linkedin.com/in/seifelden-hesham/",
+  linkedin: "https://www.linkedin.com/in/seifeldenhesham/",
   github: "https://github.com/seifXXII",
   instagram: "https://www.instagram.com/dawwud1_/",
   facebook: "https://www.facebook.com/profile.php?id=100005168138500",

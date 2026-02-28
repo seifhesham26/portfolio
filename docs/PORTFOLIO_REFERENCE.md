@@ -19,7 +19,7 @@
 
 | Platform      | URL                                                     |
 | ------------- | ------------------------------------------------------- |
-| **LinkedIn**  | https://linkedin.com/in/seifelden-hesham/               |
+| **LinkedIn**  | https://www.linkedin.com/in/seifeldenhesham/            |
 | **GitHub**    | https://github.com/seifXXII                             |
 | **Instagram** | https://www.instagram.com/dawwud1_/                     |
 | **Facebook**  | https://www.facebook.com/profile.php?id=100005168138500 |
