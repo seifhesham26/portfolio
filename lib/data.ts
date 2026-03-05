@@ -11,7 +11,7 @@ export const personalInfo = {
 
 export const socialLinks = {
   linkedin: "https://www.linkedin.com/in/seifeldenhesham/",
-  github: "https://github.com/seifXXII",
+  github: "https://github.com/seifhesham26",
   instagram: "https://www.instagram.com/dawwud1_/",
   facebook: "https://www.facebook.com/profile.php?id=100005168138500",
 };
@@ -188,16 +188,6 @@ export const projects = [
       "React Query",
       "next-intl",
     ],
-  },
-  {
-    title: "iPhone 15 Pro Showcase",
-    subtitle: "Immersive Product Experience",
-    description:
-      "Interactive product showcase with scroll-triggered animations and responsive design.",
-    image: "/images/project1.png",
-    liveUrl: "https://apple-iphone15pro-psi.vercel.app/",
-    githubUrl: "",
-    tech: ["React", "Vite", "GSAP", "Tailwind CSS", "Three.js"],
   },
 ];
 

@@ -20,7 +20,7 @@
 | Platform      | URL                                                     |
 | ------------- | ------------------------------------------------------- |
 | **LinkedIn**  | https://www.linkedin.com/in/seifeldenhesham/            |
-| **GitHub**    | https://github.com/seifXXII                             |
+| **GitHub**    | https://github.com/seifhesham26                         |
 | **Instagram** | https://www.instagram.com/dawwud1_/                     |
 | **Facebook**  | https://www.facebook.com/profile.php?id=100005168138500 |
 
@@ -93,19 +93,6 @@ Comprehensive enterprise-grade CRM system with real-time collaboration, AI-power
 - Performance optimized
 
 ---
-
-### 2. iPhone 15 Pro Showcase
-
-| Field        | Value                                     |
-| ------------ | ----------------------------------------- |
-| **Subtitle** | Immersive Product Experience              |
-| **Image**    | `/images/project1.png`                    |
-| **Live URL** | https://apple-iphone15pro-psi.vercel.app/ |
-
-**Description:**
-Interactive product showcase with scroll-triggered animations and responsive design.
-
-**Tech:** React 19 • Vite • GSAP • Tailwind CSS
 
 ---
 

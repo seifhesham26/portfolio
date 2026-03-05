@@ -20,25 +20,28 @@ export default function About() {
           {/* Bio */}
           <div className="mb-12 md:mb-16">
             <p className="text-base sm:text-lg text-muted-foreground text-center leading-relaxed">
-              I&apos;m a passionate{" "}
+              I&apos;m {personalInfo.name.split(" ")[0]}, a{" "}
               <span className="text-foreground font-medium">
-                {personalInfo.title}
+                {personalInfo.title.toLowerCase()}
               </span>{" "}
-              based in {personalInfo.location}. I specialize in building modern,
-              responsive web applications using React, Next.js, and TypeScript.
-              With a strong focus on clean code, performance optimization, and
-              user experience, I transform complex requirements into elegant
-              solutions.
+              from {personalInfo.location}. I got into web development after
+              completing my military service and haven&apos;t stopped building
+              since. I care about code that&apos;s clean, interfaces that feel
+              fast, and shipping things that actually work for real people — not
+              just in demos.
             </p>
             <p className="text-base sm:text-lg text-muted-foreground text-center leading-relaxed mt-4">
-              My experience includes serving as the sole frontend owner of a{" "}
+              My experience includes owning the entire frontend of a{" "}
               <span className="text-foreground font-medium">
                 real estate SaaS CRM
               </span>{" "}
-              for 1,000+ active users. I specialize in building real-time
-              systems, AI-integrated property matching features, and developing
-              scalable, fully customizable platforms using Next.js and
-              TypeScript.
+              serving 1,000+ active users across Egypt and UAE — building
+              everything from a real-time WhatsApp chat system to an AI-powered
+              property matching interface.
+            </p>
+            <p className="text-base sm:text-lg text-muted-foreground text-center leading-relaxed mt-4">
+              I&apos;m currently open to frontend and React/Next.js roles —
+              remote worldwide or on-site in Egypt and UAE.
             </p>
           </div>
 
