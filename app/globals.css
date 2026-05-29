@@ -320,6 +320,219 @@ p {
 }
 
 /* ============================================
+   SCROLL PROGRESS BAR
+   ============================================ */
+
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    oklch(0.95 0 0) 0%,
+    oklch(0.55 0 0 / 0.6) 100%
+  );
+  transform-origin: left center;
+  transform: scaleX(0);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* ============================================
+   CURSOR GLOW
+   ============================================ */
+
+.cursor-glow {
+  position: fixed;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(
+    circle,
+    oklch(0.75 0 0 / 0.04) 0%,
+    transparent 65%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  top: -300px;
+  left: -300px;
+  will-change: transform;
+}
+
+/* ============================================
+   HERO BACKGROUND
+   ============================================ */
+
+.hero-grid-bg {
+  background-image: radial-gradient(
+    circle,
+    oklch(0.55 0 0 / 0.25) 1px,
+    transparent 1px
+  );
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse 75% 65% at 50% 45%, black, transparent);
+  -webkit-mask-image: radial-gradient(
+    ellipse 75% 65% at 50% 45%,
+    black,
+    transparent
+  );
+}
+
+.hero-center-glow {
+  background: radial-gradient(
+    ellipse 55% 45% at 50% 40%,
+    oklch(0.18 0 0 / 0.9) 0%,
+    transparent 100%
+  );
+}
+
+/* ============================================
+   MARQUEE ANIMATION
+   ============================================ */
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-inner {
+  display: flex;
+  width: max-content;
+  animation: marquee 28s linear infinite;
+  will-change: transform;
+}
+
+.marquee-wrapper:hover .marquee-inner {
+  animation-play-state: paused;
+}
+
+/* ============================================
+   TIMELINE LINE DRAW
+   ============================================ */
+
+.timeline-line-draw {
+  transform-origin: top center;
+  will-change: transform;
+}
+
+/* ============================================
+   SECTION REVEAL UTILITIES
+   ============================================ */
+
+.gsap-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ============================================
+   CARD ENHANCEMENTS
+   ============================================ */
+
+.card-glow:hover {
+  box-shadow:
+    0 0 0 1px oklch(0.35 0 0),
+    0 20px 60px oklch(0 0 0 / 0.5),
+    0 0 40px oklch(0.25 0 0 / 0.3);
+}
+
+/* ============================================
+   SECTION DIVIDER
+   ============================================ */
+
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    oklch(0.3 0 0),
+    oklch(0.3 0 0),
+    transparent
+  );
+}
+
+/* ============================================
+   AVAILABILITY BADGE
+   ============================================ */
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.3);
+  }
+}
+
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* ============================================
+   STAT CARD STYLES
+   ============================================ */
+
+.stat-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    oklch(0.5 0 0 / 0.5),
+    transparent
+  );
+}
+
+/* ============================================
+   FEATURED PROJECT
+   ============================================ */
+
+.featured-image-wrapper {
+  will-change: transform;
+  overflow: hidden;
+}
+
+/* ============================================
+   EXPERIENCE DOT
+   ============================================ */
+
+.exp-dot {
+  will-change: transform;
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-inner {
+    animation: none;
+  }
+
+  .scroll-progress-bar {
+    transition: none;
+  }
+}
+
+/* ============================================
    BUTTONS
    ============================================ */
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { certificates } from "@/lib/data";
 import {
@@ -9,28 +10,72 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export default function Certificates() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const ctx = gsap.context(() => {
+      gsap.from(".cert-heading", {
+        opacity: 0,
+        y: 40,
+        duration: 0.8,
+        ease: "power3.out",
+        scrollTrigger: { trigger: ".cert-heading", start: "top 88%" },
+      });
+
+      gsap.from(".cert-subheading", {
+        opacity: 0,
+        y: 25,
+        duration: 0.6,
+        ease: "power2.out",
+        scrollTrigger: { trigger: ".cert-subheading", start: "top 90%" },
+      });
+
+      gsap.from(".cert-underline", {
+        scaleX: 0,
+        transformOrigin: "center center",
+        duration: 0.7,
+        ease: "power3.out",
+        scrollTrigger: { trigger: ".cert-underline", start: "top 92%" },
+      });
+
+      gsap.from(".cert-carousel", {
+        opacity: 0,
+        y: 40,
+        duration: 0.8,
+        ease: "power3.out",
+        scrollTrigger: { trigger: ".cert-carousel", start: "top 88%" },
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section id="certificates" className="section">
+    <section ref={sectionRef} id="certificates" className="section">
       <div className="container">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2
-            className="text-3xl md:text-4xl font-bold mb-4"
+            className="cert-heading text-3xl md:text-4xl font-bold mb-4"
             style={{ fontFamily: "var(--font-outfit)" }}
           >
             Certificates
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="cert-subheading text-muted-foreground max-w-2xl mx-auto">
             Professional certifications from Meta&apos;s Front-End Developer
             program on Coursera
           </p>
-          <div className="w-20 h-1 bg-foreground mx-auto rounded-full mt-4" />
+          <div className="cert-underline w-20 h-1 bg-foreground mx-auto rounded-full mt-4" />
         </div>
 
         {/* Certificates Carousel */}
-        <div className="max-w-5xl mx-auto relative">
+        <div className="cert-carousel max-w-5xl mx-auto relative">
           <Carousel
             opts={{
               align: "start",
@@ -58,7 +103,7 @@ export default function Certificates() {
                       }
                     }}
                   >
-                    <div className="relative flex flex-col h-full min-h-[220px] p-6 rounded-2xl border border-border bg-card hover:border-foreground/30 transition-all duration-300 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/30 hover:-translate-y-1">
+                    <div className="relative flex flex-col h-full min-h-[220px] p-6 rounded-2xl border border-border bg-card hover:border-foreground/30 transition-all duration-300 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/30 hover:-translate-y-1 card-glow">
                       {/* Meta Logo */}
                       <div className="mb-4">
                         <Image

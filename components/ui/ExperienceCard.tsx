@@ -19,15 +19,15 @@ export default function ExperienceCard({
 }: ExperienceCardProps) {
   return (
     <div className="relative pl-8 sm:pl-0">
-      {/* Timeline dot (Mobile: Left, Desktop: Center) */}
-      <div className="absolute left-0 sm:left-1/2 w-4 h-4 rounded-full bg-primary border-4 border-background -translate-x-1/2 mt-1.5 sm:mt-0 z-10" />
+      {/* Timeline dot */}
+      <div className="exp-dot-inner absolute left-0 sm:left-1/2 w-4 h-4 rounded-full bg-primary border-4 border-background -translate-x-1/2 mt-1.5 sm:mt-0 z-10" />
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full sm:even:flex-row-reverse mb-8 group">
-        {/* Empty space for symmetric staggered timeline on desktop */}
+        {/* Empty spacer for symmetric timeline layout */}
         <div className="hidden sm:block w-[calc(50%-1.5rem)]" />
 
         {/* Content Card */}
-        <div className="w-full sm:w-[calc(50%-1.5rem)] bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-colors shadow-sm">
+        <div className="w-full sm:w-[calc(50%-1.5rem)] bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-colors shadow-sm card-glow">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
             <h3 className="text-xl font-bold text-foreground">{role}</h3>
             <span className="text-sm font-medium px-3 py-1 bg-muted text-muted-foreground rounded-full whitespace-nowrap w-fit">
@@ -65,7 +65,7 @@ export default function ExperienceCard({
             {description.map((item, idx) => (
               <li
                 key={idx}
-                className="text-sm text-muted-foreground leading-relaxed flex items-start gap-2"
+                className="exp-bullet text-sm text-muted-foreground leading-relaxed flex items-start gap-2"
               >
                 <span className="text-primary mt-1.5 text-[10px]">▶</span>
                 {item}

@@ -64,13 +64,13 @@ export default function AnimatedCounter({
   return (
     <div ref={ref} className="text-center">
       <div
-        className="text-4xl md:text-5xl font-bold text-foreground mb-2"
+        className="text-3xl sm:text-4xl font-bold gradient-text mb-1"
         style={{ fontFamily: "var(--font-outfit)" }}
       >
         {count}
         {suffix}
       </div>
-      <div className="text-sm text-muted-foreground">{label}</div>
+      <div className="text-xs sm:text-sm text-muted-foreground">{label}</div>
     </div>
   );
 }
