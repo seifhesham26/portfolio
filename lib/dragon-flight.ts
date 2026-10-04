@@ -8,78 +8,96 @@ export type FlightPose = {
   scale: number;
   opacity: number;
 };
+export const flightSectionIds = [
+  "home",
+  "projects",
+  "about",
+  "skills",
+  "experience",
+  "education",
+  "contact",
+] as const;
 const route: FlightPose[] = [
+  { x: 0, y: 0, z: -5, pitch: 0, yaw: -0.75, roll: 0, scale: 0.4, opacity: 0 },
   {
-    x: 2.7,
-    y: 0.15,
-    z: 0,
-    pitch: 0.08,
-    yaw: -0.75,
-    roll: -0.12,
-    scale: 1.12,
-    opacity: 1,
+    x: 3,
+    y: 0.8,
+    z: -2,
+    pitch: 0.18,
+    yaw: -1.1,
+    roll: -0.3,
+    scale: 0.52,
+    opacity: 0.36,
   },
   {
     x: -3.2,
-    y: 0.6,
+    y: 0.3,
     z: -1,
-    pitch: 0.1,
-    yaw: 1.15,
-    roll: 0.28,
-    scale: 0.65,
-    opacity: 0.28,
-  },
-  {
-    x: 3.0,
-    y: -0.4,
-    z: -2,
-    pitch: -0.15,
-    yaw: -1.05,
-    roll: -0.2,
-    scale: 0.58,
-    opacity: 0.32,
-  },
-  {
-    x: -2.8,
-    y: 0.55,
-    z: -1,
-    pitch: 0.12,
-    yaw: 0.9,
-    roll: 0.18,
-    scale: 0.68,
-    opacity: 0.3,
+    pitch: -0.05,
+    yaw: 1.05,
+    roll: 0.15,
+    scale: 0.72,
+    opacity: 0.55,
   },
   {
     x: 2.6,
-    y: -0.5,
-    z: -2,
-    pitch: -0.18,
-    yaw: -1.1,
-    roll: -0.28,
-    scale: 0.55,
-    opacity: 0.32,
-  },
-  {
-    x: -2.2,
-    y: 0.3,
-    z: -1,
-    pitch: 0.08,
-    yaw: 0.85,
-    roll: 0.14,
-    scale: 0.62,
+    y: 1,
+    z: -3,
+    pitch: 0.2,
+    yaw: -0.4,
+    roll: -0.12,
+    scale: 0.5,
     opacity: 0.3,
   },
   {
-    x: 2.7,
-    y: 0.2,
-    z: 0,
-    pitch: 0.06,
+    x: -2.7,
+    y: -0.8,
+    z: -2,
+    pitch: -0.15,
+    yaw: 1.2,
+    roll: 0.32,
+    scale: 0.48,
+    opacity: 0.26,
+  },
+  {
+    x: 2.9,
+    y: 0.8,
+    z: -2,
+    pitch: 0.1,
+    yaw: -1.2,
+    roll: -0.25,
+    scale: 0.54,
+    opacity: 0.3,
+  },
+  {
+    x: 0,
+    y: 1.9,
+    z: -4,
+    pitch: 0.05,
     yaw: -0.75,
-    roll: -0.12,
-    scale: 0.96,
-    opacity: 0.55,
+    roll: -0.05,
+    scale: 0.36,
+    opacity: 0.18,
   },
 ];
+
+/** Map actual section positions, including pin spacing, into the flight route. */
+export function progressAtSections(
+  scrollTop: number,
+  stops: readonly number[],
+): number {
+  if (stops.length < 2 || !Number.isFinite(scrollTop)) return 0;
+  if (scrollTop <= stops[0]) return 0;
+  for (let index = 1; index < stops.length; index++) {
+    if (scrollTop <= stops[index]) {
+      const distance = stops[index] - stops[index - 1];
+      const fraction =
+        distance > 0 ? (scrollTop - stops[index - 1]) / distance : 0;
+      return (index - 1 + fraction) / (stops.length - 1);
+    }
+  }
+  return 1;
+}
 
 /** Continuous poses, including elastic overscroll and compact viewports. */
 export function sampleFlight(progress: number, compact = false): FlightPose {

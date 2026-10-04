@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { sampleFlight } from "../lib/dragon-flight.ts";
+import { sampleFlight, progressAtSections } from "../lib/dragon-flight.ts";
 
 test("flight stays finite at every scroll position", () => {
   for (let step = 0; step <= 1000; step++) {
@@ -41,4 +41,29 @@ test("mobile uses a smaller dragon within the viewport", () => {
     assert.ok(mobile.scale < desktop.scale);
     assert.ok(Math.abs(mobile.x) < 1.1);
   }
+});
+
+test("the temple entrance has no flying dragon", () => {
+  assert.equal(sampleFlight(0).opacity, 0);
+  assert.equal(sampleFlight(0, true).opacity, 0);
+});
+
+test("dragon progress follows real section positions", () => {
+  const stops = [0, 900, 3000, 4100, 5000, 6100, 7300];
+  assert.equal(progressAtSections(900, stops), 1 / 6);
+  assert.equal(progressAtSections(3000, stops), 2 / 6);
+  assert.equal(progressAtSections(1950, stops), 1.5 / 6);
+  assert.equal(progressAtSections(-100, stops), 0);
+  assert.equal(progressAtSections(9000, stops), 1);
+});
+
+test("dragon progress adapts when pinned work travel changes", () => {
+  assert.equal(
+    progressAtSections(4000, [0, 900, 4000, 5000, 6000, 7000, 8000]),
+    2 / 6,
+  );
+  assert.equal(
+    progressAtSections(3000, [0, 900, 3000, 4000, 5000, 6000, 7000]),
+    2 / 6,
+  );
 });

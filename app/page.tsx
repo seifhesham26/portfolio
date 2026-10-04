@@ -10,6 +10,7 @@ import {
   ArrowUp,
 } from "lucide-react";
 import ExperienceShell from "@/components/experience/ExperienceShell";
+import TempleBackdrop from "@/components/experience/TempleBackdrop";
 import ContactForm from "@/components/experience/ContactForm";
 import {
   personalInfo,
@@ -34,16 +35,7 @@ export default function Home() {
     <ExperienceShell>
       <main id="portfolio-main" tabIndex={-1}>
         <section id="home" className="hero">
-          <div className="hero-landscape">
-            <Image
-              src="/images/frozen-landscape.webp"
-              alt=""
-              fill
-              priority
-              sizes="100vw"
-            />
-          </div>
-          <div className="hero-shade" />
+          <TempleBackdrop />
           <div className="hero-content page-container">
             <p className="hero-eyebrow hero-reveal">
               SEIF EL-DEN HESHAM <span>FRONTEND DEVELOPER</span>
@@ -54,8 +46,8 @@ export default function Home() {
               <span>ordinary.</span>
             </h1>
             <p className="hero-description hero-reveal">
-              I build fast, intuitive web experiences with React, Next.js, and a
-              little imagination.
+              Thoughtful interfaces. Ambitious ideas. Built with React and
+              Next.js.
             </p>
             <div className="hero-actions hero-reveal">
               <a className="button button-primary" href="#projects">

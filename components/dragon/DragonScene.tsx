@@ -7,7 +7,12 @@ import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { sampleFlight } from "@/lib/dragon-flight";
+import {
+  sampleFlight,
+  progressAtSections,
+  flightSectionIds,
+} from "@/lib/dragon-flight";
+import { createIceMaterial } from "./ice-material";
 
 function disposeModel(root: THREE.Object3D) {
   const textures = new Set<THREE.Texture>();
@@ -63,7 +68,7 @@ export default function DragonScene({
     renderer.setClearColor(0x000000, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.9;
+    renderer.toneMappingExposure = 0.75;
     renderer.domElement.setAttribute("aria-hidden", "true");
     container.appendChild(renderer.domElement);
     const scene = new THREE.Scene();
@@ -75,14 +80,14 @@ export default function DragonScene({
     scene.environment = environmentTarget.texture;
     environment.dispose();
     pmrem.dispose();
-    scene.add(new THREE.HemisphereLight(0xc7e8ff, 0x12273e, 0.9));
-    const key = new THREE.DirectionalLight(0xe5f8ff, 2.2);
+    scene.add(new THREE.HemisphereLight(0xc7e8ff, 0x12273e, 0.6));
+    const key = new THREE.DirectionalLight(0xe5f8ff, 1.6);
     key.position.set(-3, 6, 5);
     scene.add(key);
-    const rim = new THREE.DirectionalLight(0x79d5ed, 3.2);
+    const rim = new THREE.DirectionalLight(0x79d5ed, 2.3);
     rim.position.set(5, 2, -4);
     scene.add(rim);
-    const fill = new THREE.DirectionalLight(0x6289c9, 1.1);
+    const fill = new THREE.DirectionalLight(0x6289c9, 0.8);
     fill.position.set(-6, -2, 1);
     scene.add(fill);
     const flight = new THREE.Group();
@@ -96,22 +101,90 @@ export default function DragonScene({
     let lastPoseProgress = 0;
     let heroHeight = window.innerHeight;
     let contextLost = false;
+    // Separate color spaces let one image supply color and fine scale relief.
+    const scales: THREE.Texture<HTMLImageElement | ImageData> =
+      new THREE.TextureLoader().load(
+        "/textures/wyvern-pearl-scales.webp",
+        () => {
+          if (disposed) return;
+          relief.needsUpdate = true;
+          dirty = true;
+        },
+        undefined,
+        () => {
+          if (disposed) return;
+          scales.source.data = new ImageData(
+            new Uint8ClampedArray([255, 255, 255, 255]),
+            1,
+            1,
+          );
+          scales.needsUpdate = true;
+          relief.needsUpdate = true;
+          dirty = true;
+        },
+      );
+    scales.colorSpace = THREE.SRGBColorSpace;
+    scales.flipY = false;
+    scales.wrapS = scales.wrapT = THREE.RepeatWrapping;
+    scales.repeat.set(5, 5);
+    scales.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+    const relief = scales.clone();
+    relief.colorSpace = THREE.NoColorSpace;
+    const membranes: THREE.Texture<HTMLImageElement | ImageData> =
+      new THREE.TextureLoader().load(
+        "/textures/wyvern-wing-membrane.webp",
+        () => {
+          if (!disposed) dirty = true;
+        },
+        undefined,
+        () => {
+          if (disposed) return;
+          membranes.source.data = new ImageData(
+            new Uint8ClampedArray([190, 223, 232, 255]),
+            1,
+            1,
+          );
+          membranes.needsUpdate = true;
+          dirty = true;
+        },
+      );
+    membranes.colorSpace = THREE.SRGBColorSpace;
+    membranes.flipY = false;
+    membranes.wrapS = membranes.wrapT = THREE.RepeatWrapping;
+    membranes.anisotropy = Math.min(
+      4,
+      renderer.capabilities.getMaxAnisotropy(),
+    );
     const pointer = { x: 0, y: 0 };
     const smoothed = { x: 0, y: 0 };
     const scroll = { progress: 0 };
-    const controller = gsap.to(scroll, {
-      progress: 1,
-      ease: "none",
-      scrollTrigger: {
-        trigger: "#portfolio-main",
-        start: "top top",
-        end: "bottom bottom",
-        scrub: 1.4,
-      },
-      onUpdate: () => {
+    let sectionStops: number[] = [];
+    const measureSections = () => {
+      sectionStops = flightSectionIds.map((id) => {
+        if (id === "projects") {
+          const gallery = ScrollTrigger.getById("project-pan");
+          if (gallery) return gallery.start;
+        }
+        const section = document.getElementById(id);
+        return (section?.getBoundingClientRect().top || 0) + window.scrollY;
+      });
+      heroHeight =
+        document.getElementById("home")?.offsetHeight || window.innerHeight;
+      scroll.progress = progressAtSections(window.scrollY, sectionStops);
+      dirty = true;
+    };
+    const controller = ScrollTrigger.create({
+      trigger: "#portfolio-main",
+      start: "top top",
+      end: "bottom bottom",
+      onRefresh: measureSections,
+      onUpdate: (self) => {
+        scroll.progress = progressAtSections(self.scroll(), sectionStops);
         dirty = true;
       },
     });
+    measureSections();
+    lastPoseProgress = scroll.progress;
     const count = compact ? 65 : 240;
     const positions = new Float32Array(count * 3);
     let seed = 27;
@@ -159,37 +232,23 @@ export default function DragonScene({
               ? object.material[0]
               : object.material
           ) as THREE.MeshStandardMaterial;
-          const ice = new THREE.MeshPhysicalMaterial({
-            color: 0x81bbd3,
-            metalness: 0.26,
-            roughness: 0.32,
-            clearcoat: 0.8,
-            clearcoatRoughness: 0.17,
-            iridescence: 0.12,
-            iridescenceIOR: 1.3,
-            emissive: 0x24566c,
-            emissiveIntensity: 0.12,
-            aoMap: original.aoMap,
-            aoMapIntensity: 1.3,
-            side: THREE.DoubleSide,
-            envMapIntensity: 0.6,
-          });
-          ice.onBeforeCompile = (shader) => {
-            shader.vertexShader =
-              "varying vec3 vFrostPosition;\n" + shader.vertexShader;
-            shader.vertexShader = shader.vertexShader.replace(
-              "#include <begin_vertex>",
-              "#include <begin_vertex>\nvFrostPosition = position;",
+          if (!object.geometry.hasAttribute("_surface")) {
+            object.geometry.setAttribute(
+              "_surface",
+              new THREE.BufferAttribute(
+                new Float32Array(
+                  object.geometry.getAttribute("position").count * 4,
+                ),
+                4,
+              ),
             );
-            shader.fragmentShader =
-              "varying vec3 vFrostPosition;\n" + shader.fragmentShader;
-            shader.fragmentShader = shader.fragmentShader.replace(
-              "#include <color_fragment>",
-              `#include <color_fragment>
-            float frost = sin(vFrostPosition.x * 1.7) * sin(vFrostPosition.y * 2.9) * sin(vFrostPosition.z * 2.1);
-            diffuseColor.rgb *= mix(vec3(0.56, 0.77, 0.91), vec3(0.94, 0.99, 1.0), frost * 0.5 + 0.5);`,
-            );
-          };
+          }
+          const ice = createIceMaterial(
+            original.aoMap,
+            scales,
+            relief,
+            membranes,
+          );
           original.dispose();
           object.material = ice;
           object.frustumCulled = false;
@@ -206,7 +265,7 @@ export default function DragonScene({
         const bounds = new THREE.Box3().setFromObject(model);
         const size = bounds.getSize(new THREE.Vector3());
         const center = bounds.getCenter(new THREE.Vector3());
-        const normalization = 6.8 / Math.max(size.x, size.y, size.z);
+        const normalization = 6.2 / Math.max(size.x, size.y, size.z);
         model.scale.multiplyScalar(normalization);
         model.position.addScaledVector(center, -normalization);
         bank.add(model);
@@ -220,7 +279,8 @@ export default function DragonScene({
     );
 
     const resize = () => {
-      heroHeight = document.getElementById("home")?.offsetHeight || window.innerHeight;
+      heroHeight =
+        document.getElementById("home")?.offsetHeight || window.innerHeight;
       compact = window.innerWidth < 768;
       camera.fov = compact ? 44 : 32;
       camera.aspect = window.innerWidth / window.innerHeight;
@@ -273,20 +333,29 @@ export default function DragonScene({
         smoothed.x = THREE.MathUtils.lerp(smoothed.x, pointer.x, 0.025);
         smoothed.y = THREE.MathUtils.lerp(smoothed.y, pointer.y, 0.025);
       }
-      if (active) lastPoseProgress = scroll.progress;
+      if (active)
+        lastPoseProgress = THREE.MathUtils.damp(
+          lastPoseProgress,
+          scroll.progress,
+          5,
+          delta,
+        );
       const pose = sampleFlight(lastPoseProgress, compact);
+      const viewportFit = compact ? 1 : Math.min(1, camera.aspect / 1.85);
       flight.position.set(
-        pose.x,
+        pose.x * viewportFit,
         pose.y + (active ? Math.sin(elapsed * 0.7) * 0.08 : 0),
         pose.z,
       );
       flight.rotation.set(
         pose.pitch,
-        pose.yaw + (active ? smoothed.x * 0.12 : 0),
+        pose.yaw + (active && !compact ? smoothed.x * 0.12 : 0),
         pose.roll,
       );
-      flight.scale.setScalar(pose.scale);
-      container.style.opacity = active || window.scrollY < heroHeight ? String(pose.opacity) : "0";
+      flight.scale.setScalar(pose.scale * viewportFit);
+      const pastTemple = window.scrollY >= heroHeight - 1;
+      container.style.opacity =
+        active && pastTemple ? String(pose.opacity) : "0";
       bank.rotation.x = active ? smoothed.y * 0.045 : 0;
       if (active) {
         for (let index = 0; index < count; index++) {
@@ -301,7 +370,6 @@ export default function DragonScene({
     });
     return () => {
       disposed = true;
-      controller.scrollTrigger?.kill();
       controller.kill();
       renderer.setAnimationLoop(null);
       window.removeEventListener("resize", resize);
@@ -319,6 +387,10 @@ export default function DragonScene({
         mixer?.uncacheRoot(model);
         disposeModel(model);
       }
+      // Covers model-load failure, when the maps have no material owner.
+      scales.dispose();
+      relief.dispose();
+      membranes.dispose();
       snowGeometry.dispose();
       snowMaterial.dispose();
       environmentTarget.dispose();

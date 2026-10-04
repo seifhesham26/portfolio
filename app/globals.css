@@ -191,7 +191,7 @@ img {
   padding-inline: 18px;
   background: #071018bf;
   border: 1px solid #b4e2ed24;
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px) saturate(145%);
 }
 .wordmark {
   font-family: var(--font-outfit), sans-serif;
@@ -1307,4 +1307,397 @@ html[data-motion="off"] .sending-icon {
     background: #0c1923;
     backdrop-filter: none;
   }
+}
+
+/* Temple 0, flight 1, content 2, reveal control 3, navigation 10. */
+.hero {
+  background: #adafb0;
+  color: #20282b;
+  isolation: isolate;
+  overflow: hidden;
+}
+.temple-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.temple-stage {
+  position: absolute;
+  inset: -2%;
+  transform-origin: 50% 62%;
+  background: #adafb0;
+}
+.temple-stage img {
+  object-fit: cover;
+  object-position: 50% 50%;
+  filter: none;
+}
+.temple-base {
+  opacity: 1;
+}
+.temple-reveal,
+.temple-memory {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  --reveal-x: 0px;
+  --reveal-y: 0px;
+}
+.temple-reveal-core {
+  position: absolute;
+  inset: 0;
+  mask-image: radial-gradient(
+    circle 260px at var(--reveal-x) var(--reveal-y),
+    #000 0%,
+    #000 38%,
+    #000b 57%,
+    transparent 82%
+  );
+  -webkit-mask-image: radial-gradient(
+    circle 260px at var(--reveal-x) var(--reveal-y),
+    #000 0%,
+    #000 38%,
+    #000b 57%,
+    transparent 82%
+  );
+}
+
+.temple-full-reveal {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.7s cubic-bezier(0.37, 0, 0.63, 1);
+}
+.temple-full-reveal[data-revealed="true"] {
+  opacity: 1;
+}
+html[data-motion="off"] .temple-full-reveal {
+  transition: none;
+}
+.temple-atmosphere {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 40%, #c7cacc33, transparent 55%),
+    linear-gradient(0deg, #071018 0%, #07101800 9%, transparent 100%);
+}
+.hero-content {
+  align-items: center;
+  text-align: center;
+  padding-block: 40px 100px;
+}
+.hero-eyebrow {
+  justify-content: center;
+  color: #3b464b;
+  margin-bottom: 30px;
+}
+.hero-eyebrow span {
+  color: #3b464b;
+}
+.hero h1 {
+  font-size: clamp(88px, 10.4vw, 154px);
+  line-height: 0.94;
+  font-weight: 500;
+  letter-spacing: -0.065em;
+  color: #20282b;
+  text-shadow: 0 1px 0 #e6e8e97a;
+}
+.hero h1 > span {
+  color: #354044;
+}
+.hero-description {
+  color: #303a3f;
+  max-width: 330px;
+  font-size: 13px;
+  line-height: 1.8;
+  margin-top: 26px;
+}
+.hero-actions {
+  gap: 28px;
+  margin-top: 26px;
+}
+.hero .button-primary {
+  background: #263237;
+  color: #eff2f3;
+  border-color: #263237;
+}
+.hero .button-primary:hover {
+  background: #111d23;
+}
+.hero .text-link {
+  color: #263237;
+  border-color: #26323766;
+}
+.hero :focus-visible {
+  outline-color: #20282b;
+}
+.temple-reveal-control {
+  position: absolute;
+  z-index: 3;
+  left: 5.5vw;
+  bottom: 34px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 13px;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  border: 1px solid #d9dfe54a;
+  background: #222c32bf;
+  color: #f0f3f5;
+}
+.temple-reveal-control:hover {
+  background: #18262e;
+}
+html:not([data-temple="false"]) .site-header {
+  background: #bac0c1a8;
+  border-color: #35404433;
+  color: #202b30;
+}
+html:not([data-temple="false"]) .site-header .wordmark span {
+  color: #455b64;
+}
+html:not([data-temple="false"]) .site-header .motion-control,
+html:not([data-temple="false"]) .site-header .menu-control {
+  color: #303e45;
+}
+html:not([data-temple="false"]) .main-nav > a:hover {
+  color: #081a22;
+}
+html:not([data-temple="false"]) .site-header :focus-visible {
+  outline-color: #202b30;
+}
+.experience-list {
+  position: relative;
+  padding-left: 30px;
+  --journey-progress: 1;
+}
+.experience-list::before,
+.experience-list::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #b4e2ed25;
+  pointer-events: none;
+}
+.experience-list::after {
+  background: #b4e2ed;
+  transform: scaleY(var(--journey-progress));
+  transform-origin: top;
+}
+.experience-row {
+  position: relative;
+}
+.experience-row::before {
+  content: "";
+  position: absolute;
+  top: 49px;
+  left: -34px;
+  width: 9px;
+  height: 9px;
+  border: 1px solid #a6d2df;
+  background: #10202a;
+  transform: rotate(45deg);
+}
+html[data-motion="off"] .experience-list {
+  --journey-progress: 1 !important;
+}
+@media (max-width: 767px) {
+  .hero-content {
+    justify-content: center;
+    min-height: calc(100svh - 82px);
+    padding-block: 36px 100px;
+  }
+  .hero h1 {
+    font-size: clamp(72px, 18vw, 110px);
+  }
+  .hero-eyebrow {
+    align-items: center;
+    font-size: 9px;
+    margin-bottom: 25px;
+    gap: 4px;
+  }
+  .hero-description {
+    max-width: 270px;
+    font-size: 12px;
+    margin-top: 24px;
+  }
+  .hero-actions {
+    gap: 20px;
+  }
+  .temple-stage img {
+    object-position: 22% center;
+  }
+  .temple-reveal-control {
+    left: 24px;
+    bottom: 32px;
+  }
+  html:not([data-temple="false"]) .main-nav {
+    background: #bcc2c3fa;
+    border-color: #35404433;
+  }
+  .experience-list {
+    padding-left: 22px;
+  }
+  .experience-row::before {
+    left: -26px;
+    top: 33px;
+  }
+}
+@media (hover: none) {
+  .temple-memory {
+    display: none;
+  }
+  .temple-reveal {
+    opacity: 0.15;
+  }
+  .temple-reveal-core {
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+}
+
+/* Liquid Glass inspired web material. Controls are pills; content stays square. */
+:root {
+  --glass-tint: rgb(16 36 48 / 0.64);
+  --glass-ink: #edf5f8;
+  --glass-edge: rgb(210 238 247 / 0.3);
+  --glass-solid: #17303d;
+}
+.hero,
+html:not([data-temple="false"]) .site-header {
+  --glass-tint: rgb(232 242 246 / 0.22);
+  --glass-ink: #17252c;
+  --glass-edge: rgb(245 251 253 / 0.58);
+  --glass-solid: #dce5e8;
+}
+:is(.site-header, .button, .text-link, .motion-control, .menu-control,
+    .temple-reveal-control, .project-open, .experience-detail summary),
+.hero :is(.button-primary, .text-link),
+html:not([data-temple="false"]) .site-header {
+  isolation: isolate;
+  border-radius: 999px;
+  border: 1px solid var(--glass-edge);
+  background:
+    linear-gradient(145deg, rgb(250 254 255 / 0.2), rgb(250 254 255 / 0.02) 48%, rgb(218 244 252 / 0.1)),
+    var(--glass-tint);
+  color: var(--glass-ink);
+  backdrop-filter: blur(20px) saturate(145%);
+  -webkit-backdrop-filter: blur(20px) saturate(145%);
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 0.52),
+    inset 0 -1px 1px rgb(193 226 239 / 0.15),
+    0 8px 24px rgb(3 14 23 / 0.16);
+}
+:is(.button, .text-link, .motion-control, .menu-control, .experience-detail summary) {
+  position: relative;
+}
+:is(.site-header, .button, .text-link, .motion-control, .menu-control,
+    .temple-reveal-control, .project-open, .experience-detail summary)::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 18% 0%, rgb(255 255 255 / 0.32), transparent 55%),
+    linear-gradient(110deg, transparent 55%, rgb(255 255 255 / 0.08) 75%, transparent);
+}
+.site-header {
+  padding-inline: 22px 10px;
+}
+.main-nav {
+  gap: clamp(4px, 1vw, 16px);
+}
+.main-nav > a {
+  padding: 8px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: background 0.22s, color 0.22s;
+}
+.main-nav > a:hover {
+  background: rgb(220 241 249 / 0.12);
+}
+:is(.button, .text-link, .motion-control, .menu-control,
+    .temple-reveal-control, .experience-detail summary) {
+  transition: transform 0.22s, box-shadow 0.22s;
+}
+:is(.text-link, .experience-detail summary) {
+  padding: 12px 20px;
+  min-height: 46px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.motion-control {
+  padding: 10px 14px;
+}
+.header-controls {
+  gap: 8px;
+}
+:is(.button, .text-link, .motion-control, .menu-control,
+    .temple-reveal-control, .experience-detail summary):hover,
+.hero :is(.button-primary, .text-link):hover {
+  background:
+    linear-gradient(145deg, rgb(250 254 255 / 0.28), rgb(250 254 255 / 0.05) 48%, rgb(218 244 252 / 0.14)),
+    var(--glass-tint);
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 0.7),
+    inset 0 -1px 1px rgb(193 226 239 / 0.24),
+    0 10px 28px rgb(3 14 23 / 0.2);
+}
+:is(.button, .text-link, .motion-control, .menu-control,
+    .temple-reveal-control, .experience-detail summary):active {
+  transform: scale(0.97);
+}
+@media (max-width: 767px) {
+  .site-header {
+    padding-inline: 18px 6px;
+  }
+  .motion-control {
+    padding: 10px 12px;
+  }
+  .main-nav,
+  html:not([data-temple="false"]) .main-nav {
+    border-radius: 24px;
+    background:
+      linear-gradient(145deg, rgb(250 254 255 / 0.24), transparent 55%),
+      color-mix(in srgb, var(--glass-solid) 84%, transparent);
+    backdrop-filter: blur(24px) saturate(145%);
+    -webkit-backdrop-filter: blur(24px) saturate(145%);
+    border-color: var(--glass-edge);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28), 0 12px 36px rgb(3 14 23 / 0.2);
+  }
+  .main-nav > a {
+    padding: 14px 12px;
+  }
+  .hero-actions {
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .hero .text-link {
+    padding-inline: 16px;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  :is(.site-header, .button, .text-link, .motion-control, .menu-control,
+      .temple-reveal-control, .project-open, .experience-detail summary),
+  .hero :is(.button-primary, .text-link),
+  html:not([data-temple="false"]) .site-header,
+  .main-nav,
+  html:not([data-temple="false"]) .main-nav {
+    background: var(--glass-solid);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+html[data-motion="off"] :is(.button, .text-link, .motion-control, .menu-control,
+    .temple-reveal-control, .experience-detail summary) {
+  transition: none;
 }
