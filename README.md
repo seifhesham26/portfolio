@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Seif — Ice Wyvern Portfolio
 
-## Getting Started
+A Next.js portfolio with an arctic visual identity, a real Three.js animated wyvern, and GSAP scroll choreography. Projects, experience, education, credentials, CV and social links come from the existing content in lib/data.ts.
 
-First, run the development server:
+## Development
+
+Use Node.js 22.6 or newer (tested with Node.js 24) and pnpm.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. Production commands: pnpm build, then pnpm start.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Motion and artwork
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- components/dragon/DragonScene.tsx owns the renderer, frost material, original flying clip, snow and resource cleanup.
+- lib/dragon-flight.ts defines the continuous flight route and mobile poses.
+- components/experience/ExperienceShell.tsx owns GSAP reveals, parallax, the desktop project gallery, keyboard navigation and motion preferences.
+- The Motion button pauses animations; system reduced-motion preferences use static sections. Mobile projects stay vertical. The portfolio remains usable if 3D cannot load.
+- public/images/frozen-landscape.webp and arctic-detail.webp are generated arctic artwork.
 
-## Learn More
+The supplied dragon was optimized from approximately 26 MB to 6 MB. To regenerate it, extract source/demon_dragon.glb from the original archive to .cache/demon_dragon.glb, then run pnpm prepare:dragon. Asset tooling is in scripts/prepare-dragon.mjs; provenance is in public/models/README.md.
 
-To learn more about Next.js, take a look at the following resources:
+## Validation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+pnpm test
+pnpm exec tsc --noEmit
+pnpm lint
+pnpm build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Flight tests cover finite poses, clamping, continuity, traversal and mobile constraints. Desktop and mobile browser checks cover navigation, gallery focus, pause/resume and invalid contact input. The contact form retains the existing EmailJS integration; browser checks do not send actual email. Delivery and Lighthouse performance have not been measured.

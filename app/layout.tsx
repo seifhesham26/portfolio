@@ -1,10 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Space_Grotesk, Outfit } from "next/font/google";
 import "./globals.css";
-import CursorGlow from "@/components/ui/CursorGlow";
 
-const inter = Inter({
-  variable: "--font-inter",
+const space = Space_Grotesk({
+  variable: "--font-body",
   subsets: ["latin"],
   display: "swap",
 });
@@ -19,10 +18,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fafafa" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
-  ],
+  themeColor: "#071018",
 };
 
 export const metadata: Metadata = {
@@ -32,7 +28,7 @@ export const metadata: Metadata = {
     template: "%s | Seif Elden Hesham",
   },
   description:
-    "Passionate frontend developer specializing in React, Next.js, and modern web technologies. Creating exceptional digital experiences with clean code and modern design.",
+    "Seif El-Den Hesham builds intuitive React and Next.js experiences, from real-time SaaS platforms to commerce. Explore the work in an immersive arctic portfolio.",
   keywords: [
     "Frontend Developer",
     "React Developer",
@@ -58,7 +54,6 @@ export const metadata: Metadata = {
       { url: "/favicon.ico", sizes: "any" },
       { url: "/icon.svg", type: "image/svg+xml" },
     ],
-    apple: "/apple-touch-icon.png",
   },
   manifest: "/site.webmanifest",
   openGraph: {
@@ -109,11 +104,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark scroll-smooth">
+    <html lang="en" className="dark">
       <body
-        className={`${inter.variable} ${outfit.variable} antialiased bg-background text-foreground`}
+        className={`${space.variable} ${outfit.variable} antialiased bg-background text-foreground`}
       >
-        <CursorGlow />
         {children}
       </body>
     </html>
