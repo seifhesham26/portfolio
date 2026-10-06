@@ -81,7 +81,7 @@ const route: FlightPose[] = [
   },
 ];
 
-/** Map actual section positions, including pin spacing, into the flight route. */
+/** Map actual section positions, including responsive section heights, into the flight route. */
 export function progressAtSections(
   scrollTop: number,
   stops: readonly number[],
@@ -124,4 +124,16 @@ export function sampleFlight(progress: number, compact = false): FlightPose {
     pose.opacity *= 1 - clamped * 0.7;
   }
   return pose;
+}
+
+/** Side guardian enters before Work, holds its pose, and retreats as About arrives. */
+export function projectGuardianWeight(scrollTop: number, start: number, end: number, height: number): number {
+  if (![scrollTop, start, end, height].every(Number.isFinite) || height <= 0 || end <= start) return 0;
+  const smooth = (value: number) => {
+    const t = Math.max(0, Math.min(1, value));
+    return t * t * (3 - 2 * t);
+  };
+  const enter = smooth((scrollTop - start + height * .6) / (height * .45));
+  const leave = 1 - smooth((scrollTop - end + height * .45) / (height * .4));
+  return Math.min(enter, leave);
 }

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --experimental-strip-types --test tests/dragon-flight.test.ts tests/dragon-surfaces.test.mjs",
+    "test": "node --experimental-strip-types --test tests/dragon-flight.test.ts tests/dragon-surfaces.test.mjs tests/intro.test.ts",
     "prepare:dragon": "node scripts/prepare-dragon.mjs"
   },
   "dependencies": {

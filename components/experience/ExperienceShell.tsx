@@ -1,6 +1,7 @@
 "use client";
 import {
   useEffect,
+  useCallback,
   useRef,
   useState,
   useSyncExternalStore,
@@ -12,6 +13,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MotionPreference } from "./MotionPreference";
 import { createSectionMotion } from "./section-motion";
 import { ArrowUpRight, Menu, X, Pause, Play } from "lucide-react";
+import BrandIntro from "@/components/intro/BrandIntro";
+import { personalInfo } from "@/lib/data";
 
 const DragonScene = dynamic(() => import("@/components/dragon/DragonScene"), {
   ssr: false,
@@ -24,6 +27,9 @@ function subscribeMotion(callback: () => void) {
 const getReducedMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const getServerMotion = () => true;
+const subscribeHydration = () => () => {};
+const getHydrated = () => true;
+const getServerHydrated = () => false;
 
 export default function ExperienceShell({ children }: { children: ReactNode }) {
   const root = useRef<HTMLDivElement>(null);
@@ -33,6 +39,12 @@ export default function ExperienceShell({ children }: { children: ReactNode }) {
   const [paused, setPaused] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dragonEntered, setDragonEntered] = useState(false);
+  const [introPhase, setIntroPhase] = useState<"loading" | "revealing" | "done">("loading");
+  const [replay, setReplay] = useState(false);
+  const hydrated = useSyncExternalStore(subscribeHydration, getHydrated, getServerHydrated);
+  const introActive = hydrated && introPhase !== "done";
+  const revealPortfolio = useCallback(() => setIntroPhase("revealing"), []);
+  const completeIntro = useCallback(() => setIntroPhase("done"), []);
   const reduced = useSyncExternalStore(
     subscribeMotion,
     getReducedMotion,
@@ -72,7 +84,7 @@ export default function ExperienceShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.dataset.motion = motionEnabled ? "on" : "off";
     gsap.registerPlugin(ScrollTrigger);
-    if (!motionEnabled) return;
+    if (!motionEnabled || !hydrated || introPhase === "loading") return;
     const playIntro = !introPlayed.current;
     const context = gsap.context(() => {
       if (playIntro) {
@@ -136,7 +148,7 @@ export default function ExperienceShell({ children }: { children: ReactNode }) {
       currentRoot?.removeEventListener("toggle", refresh, true);
       context.revert();
     };
-  }, [motionEnabled]);
+  }, [motionEnabled, hydrated, introPhase]);
   useEffect(() => {
     if (!menuOpen) return;
     root.current?.querySelector<HTMLAnchorElement>(".main-nav a")?.focus();
@@ -153,20 +165,22 @@ export default function ExperienceShell({ children }: { children: ReactNode }) {
   return (
     <MotionPreference value={motionEnabled}>
       <div ref={root} className="experience-root">
+        {introActive && <BrandIntro onReveal={revealPortfolio} onComplete={completeIntro} replay={replay} />}
+        <div className="portfolio-content" inert={introActive} aria-hidden={introActive ? true : undefined}>
         <a href="#portfolio-main" className="skip-link">
           Skip to content
         </a>
-        {dragonEntered && !reduced && (
+        {dragonEntered && !reduced && introPhase === "done" && (
           <DragonScene motionEnabled={motionEnabled} />
         )}
         <header className="site-header">
           <a
-            className="wordmark"
+            className={`wordmark brand-name ${introActive ? "brand-awaiting" : ""}`}
             href="#home"
-            aria-label="Seif, back to home"
+            aria-label={`${personalInfo.name}, back to home`}
             onClick={closeMenu}
           >
-            SEIF<span>.</span>
+            <span>SEIF EL-DEN</span><span>HESHAM</span>
           </a>
           <nav
             className={`main-nav ${menuOpen ? "is-open" : ""}`}
@@ -229,6 +243,15 @@ export default function ExperienceShell({ children }: { children: ReactNode }) {
           </div>
         </header>
         {children}
+        <div className="intro-replay-row page-container">
+          <button type="button" className="intro-replay" onClick={() => {
+            setReplay(true);
+            setMenuOpen(false);
+            introPlayed.current = false;
+            setIntroPhase("loading");
+          }}>Replay introduction <ArrowUpRight size={13} /></button>
+        </div>
+        </div>
       </div>
     </MotionPreference>
   );

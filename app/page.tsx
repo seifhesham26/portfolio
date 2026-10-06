@@ -12,18 +12,17 @@ import {
 import ExperienceShell from "@/components/experience/ExperienceShell";
 import TempleBackdrop from "@/components/experience/TempleBackdrop";
 import ContactForm from "@/components/experience/ContactForm";
+import ProjectShowcase from "@/components/experience/ProjectShowcase";
 import {
   personalInfo,
   socialLinks,
   featuredProject,
-  projects,
   experiences,
   education,
   certificates,
   skills,
 } from "@/lib/data";
 
-const portfolioProjects = [featuredProject, ...projects];
 const cleanText = (value: string) =>
   value
     .replace(/\s*—\s*/g, ", ")
@@ -68,61 +67,13 @@ export default function Home() {
         <section id="projects" className="work-section content-section">
           <div className="page-container work-heading">
             <p className="section-intro" data-reveal>
-              From imagination to production
+              Selected work
             </p>
             <h2 data-reveal>
               Ideas made <span>real.</span>
             </h2>
           </div>
-          <div className="project-viewport">
-            <div className="project-rail">
-              {portfolioProjects.map((project, index) => (
-                <article
-                  key={project.title}
-                  className={`project-panel project-panel-${index}`}
-                >
-                  <a
-                    href={project.liveUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="project-image"
-                    aria-label={`Visit ${project.title}`}
-                  >
-                    <Image
-                      src={project.image}
-                      alt={`${project.title} website preview`}
-                      width={1600}
-                      height={950}
-                      sizes="(max-width: 1023px) 92vw, 68vw"
-                    />
-                    <span className="project-open" aria-hidden="true">
-                      <ArrowUpRight size={28} />
-                    </span>
-                  </a>
-                  <div className="project-caption">
-                    <div>
-                      <p>{project.subtitle}</p>
-                      <h3>
-                        <a
-                          href={project.liveUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {project.title} <ArrowUpRight size={24} />
-                        </a>
-                      </h3>
-                    </div>
-                    <div className="project-technologies">
-                      {project.tech.slice(0, 3).map((tech) => (
-                        <span key={tech}>{tech}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <p className="project-description">{project.description}</p>
-                </article>
-              ))}
-            </div>
-          </div>
+          <ProjectShowcase />
         </section>
 
         <section

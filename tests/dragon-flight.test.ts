@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { sampleFlight, progressAtSections } from "../lib/dragon-flight.ts";
+import { sampleFlight, progressAtSections, projectGuardianWeight } from "../lib/dragon-flight.ts";
 
 test("flight stays finite at every scroll position", () => {
   for (let step = 0; step <= 1000; step++) {
@@ -57,7 +57,7 @@ test("dragon progress follows real section positions", () => {
   assert.equal(progressAtSections(9000, stops), 1);
 });
 
-test("dragon progress adapts when pinned work travel changes", () => {
+test("dragon progress adapts when responsive section heights change", () => {
   assert.equal(
     progressAtSections(4000, [0, 900, 4000, 5000, 6000, 7000, 8000]),
     2 / 6,
@@ -66,4 +66,24 @@ test("dragon progress adapts when pinned work travel changes", () => {
     progressAtSections(3000, [0, 900, 3000, 4000, 5000, 6000, 7000]),
     2 / 6,
   );
+});
+
+test("the side guardian holds its pose through the project section", () => {
+  for (const scrollTop of [850, 900, 1200, 1500]) {
+    assert.equal(projectGuardianWeight(scrollTop, 900, 1900, 800), 1);
+  }
+  assert.equal(projectGuardianWeight(0, 900, 1900, 800), 0);
+  assert.equal(projectGuardianWeight(1900, 900, 1900, 800), 0);
+});
+
+test("guardian entry and retreat stay bounded and continuous", () => {
+  let previous = 0;
+  for (let scrollTop = 0; scrollTop <= 2200; scrollTop++) {
+    const value = projectGuardianWeight(scrollTop, 900, 1900, 800);
+    assert.ok(value >= 0 && value <= 1);
+    assert.ok(Math.abs(value - previous) < .01);
+    previous = value;
+  }
+  assert.equal(projectGuardianWeight(NaN, 900, 1900, 800), 0);
+  assert.equal(projectGuardianWeight(1000, 900, 1900, 0), 0);
 });

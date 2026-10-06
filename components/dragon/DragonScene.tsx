@@ -11,6 +11,7 @@ import {
   sampleFlight,
   progressAtSections,
   flightSectionIds,
+  projectGuardianWeight,
 } from "@/lib/dragon-flight";
 import { createIceMaterial } from "./ice-material";
 
@@ -101,6 +102,11 @@ export default function DragonScene({
     let lastPoseProgress = 0;
     let heroHeight = window.innerHeight;
     let contextLost = false;
+    let projectStart = 0;
+    let projectEnd = 0;
+    let guarding = false;
+    const headAnchor = new THREE.Vector3();
+    const foldedWings: { bone: THREE.Bone; rest: THREE.Quaternion; folded: THREE.Quaternion }[] = [];
     // Separate color spaces let one image supply color and fine scale relief.
     const scales: THREE.Texture<HTMLImageElement | ImageData> =
       new THREE.TextureLoader().load(
@@ -161,15 +167,14 @@ export default function DragonScene({
     let sectionStops: number[] = [];
     const measureSections = () => {
       sectionStops = flightSectionIds.map((id) => {
-        if (id === "projects") {
-          const gallery = ScrollTrigger.getById("project-pan");
-          if (gallery) return gallery.start;
-        }
         const section = document.getElementById(id);
         return (section?.getBoundingClientRect().top || 0) + window.scrollY;
       });
       heroHeight =
         document.getElementById("home")?.offsetHeight || window.innerHeight;
+      const work = document.getElementById("projects");
+      projectStart = sectionStops[1];
+      projectEnd = projectStart + (work?.offsetHeight || 0);
       scroll.progress = progressAtSections(window.scrollY, sectionStops);
       dirty = true;
     };
@@ -269,6 +274,49 @@ export default function DragonScene({
         model.scale.multiplyScalar(normalization);
         model.position.addScaledVector(center, -normalization);
         bank.add(model);
+        model.updateMatrixWorld(true);
+        // Anchor the close-up to the rig's head rather than its wingspan.
+        model.traverse((object) => {
+          if (object instanceof THREE.Bone && /^head/i.test(object.name)) {
+            object.getWorldPosition(headAnchor);
+            bank.worldToLocal(headAnchor);
+          }
+        });
+        // Fold both shoulders back along the body for the stationary close-up.
+        const retreat = headAnchor.clone().negate().normalize();
+        for (const side of ["l", "r"]) {
+          let shoulder: THREE.Bone | undefined;
+          let hand: THREE.Bone | undefined;
+          model.traverse((object) => {
+            if (!(object instanceof THREE.Bone)) return;
+            if (object.name.startsWith(side + "_shoulder") && !object.name.includes("Twist")) shoulder = object;
+            if (object.name.startsWith(side + "_hand") && !object.name.includes("Mid")) hand = object;
+          });
+          if (!shoulder || !hand || !shoulder.parent) continue;
+          const arm = hand.getWorldPosition(new THREE.Vector3()).sub(shoulder.getWorldPosition(new THREE.Vector3())).normalize();
+          const turn = new THREE.Quaternion().setFromUnitVectors(arm, retreat);
+          const world = shoulder.getWorldQuaternion(new THREE.Quaternion());
+          const parent = shoulder.parent.getWorldQuaternion(new THREE.Quaternion());
+          foldedWings.push({ bone: shoulder, rest: shoulder.quaternion.clone(), folded: parent.invert().multiply(turn).multiply(world) });
+        }
+        for (const wing of foldedWings) wing.bone.quaternion.copy(wing.folded);
+        model.updateMatrixWorld(true);
+        for (const side of ["l", "r"]) {
+          let hand: THREE.Bone | undefined;
+          let tip: THREE.Bone | undefined;
+          model.traverse((object) => {
+            if (!(object instanceof THREE.Bone)) return;
+            if (object.name.startsWith(side + "_hand") && !object.name.includes("Mid")) hand = object;
+            if (object.name.startsWith(side + "_fingerD_04")) tip = object;
+          });
+          if (!hand || !tip || !hand.parent) continue;
+          const direction = tip.getWorldPosition(new THREE.Vector3()).sub(hand.getWorldPosition(new THREE.Vector3())).normalize();
+          const turn = new THREE.Quaternion().setFromUnitVectors(direction, retreat);
+          const world = hand.getWorldQuaternion(new THREE.Quaternion());
+          const parent = hand.parent.getWorldQuaternion(new THREE.Quaternion());
+          foldedWings.push({ bone: hand, rest: hand.quaternion.clone(), folded: parent.invert().multiply(turn).multiply(world) });
+        }
+        for (const wing of foldedWings) wing.bone.quaternion.copy(wing.rest);
         dirty = true;
         setStatus("ready");
       },
@@ -327,9 +375,14 @@ export default function DragonScene({
         wasMoving = active;
       }
       if (!active && !dirty) return;
+      const guardian = projectGuardianWeight(window.scrollY, projectStart, projectEnd, window.innerHeight);
+      if (guardian > 0 && !guarding) {
+        mixer?.setTime(0.3);
+        guarding = true;
+      } else if (guardian === 0) guarding = false;
       if (active) {
         elapsed += delta;
-        mixer?.update(delta * 0.8);
+        if (!guarding) mixer?.update(delta * 0.8);
         smoothed.x = THREE.MathUtils.lerp(smoothed.x, pointer.x, 0.025);
         smoothed.y = THREE.MathUtils.lerp(smoothed.y, pointer.y, 0.025);
       }
@@ -340,23 +393,40 @@ export default function DragonScene({
           5,
           delta,
         );
+      if (guarding) for (const wing of foldedWings) {
+        wing.bone.quaternion.slerpQuaternions(wing.rest, wing.folded, guardian);
+      }
       const pose = sampleFlight(lastPoseProgress, compact);
       const viewportFit = compact ? 1 : Math.min(1, camera.aspect / 1.85);
+      const halfHeight = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * 12;
+      const halfWidth = halfHeight * camera.aspect;
+      const blend = (from: number, to: number) => THREE.MathUtils.lerp(from, to, guardian);
       flight.position.set(
-        pose.x * viewportFit,
-        pose.y + (active ? Math.sin(elapsed * 0.7) * 0.08 : 0),
-        pose.z,
+        blend(pose.x * viewportFit, halfWidth * (compact ? .85 : camera.aspect < 1.2 ? 1 : .87) + (1 - guardian) * 4),
+        blend(pose.y + (active ? Math.sin(elapsed * .7) * .08 : 0), halfHeight * (compact ? .5 : -.15)),
+        blend(pose.z, 0),
       );
       flight.rotation.set(
-        pose.pitch,
-        pose.yaw + (active && !compact ? smoothed.x * 0.12 : 0),
-        pose.roll,
+        blend(pose.pitch, -.05),
+        blend(pose.yaw + (active && !compact ? smoothed.x * .12 : 0), -1.84),
+        blend(pose.roll, -.08),
       );
-      flight.scale.setScalar(pose.scale * viewportFit);
+      flight.scale.setScalar(blend(pose.scale * viewportFit, compact ? 2.2 : 4.4 * Math.min(1, camera.aspect / 1.35)));
+      bank.position.copy(headAnchor).multiplyScalar(-guardian);
+      bank.rotation.x = active ? smoothed.y * .045 * (1 - guardian) : 0;
       const pastTemple = window.scrollY >= heroHeight - 1;
-      container.style.opacity =
-        active && pastTemple ? String(pose.opacity) : "0";
-      bank.rotation.x = active ? smoothed.y * 0.045 : 0;
+      container.style.opacity = active ? String(guardian > 0 ? blend(pastTemple ? pose.opacity : 0, .9) : pastTemple ? pose.opacity : 0) : "0";
+      // The close-up must never leak across the temple boundary.
+      container.style.clipPath = guardian > 0
+        ? "inset(" + Math.max(0, projectStart - window.scrollY) + "px 0 " + Math.max(0, window.innerHeight - (projectEnd - window.scrollY)) + "px 0)"
+        : "none";
+      // A soft portrait vignette isolates the head and neck at the screen edge.
+      const outer = 1 - guardian;
+      const center = compact ? 25 : 57.5;
+      container.style.maskImage = guarding
+        ? "linear-gradient(to bottom, rgb(0 0 0 / " + outer + ") " + (center - 18) + "%, #000 " + (center - 9) + "%, #000 " + (center + 10) + "%, rgb(0 0 0 / " + outer + ") " + (center + 22) + "%)"
+        : "none";
+      container.dataset.dragonMode = guarding ? "guardian" : "flight";
       if (active) {
         for (let index = 0; index < count; index++) {
           const y = index * 3 + 1;

@@ -1,5 +1,4 @@
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 /** Each section has a distinct gesture; GSAP's parent context owns all cleanup. */
 export function createSectionMotion(playIntro: boolean) {
@@ -128,68 +127,7 @@ export function createSectionMotion(playIntro: boolean) {
   });
   enter(find(".contact-heading"), { x: -32, opacity: 0 });
   enter(find(".contact-form-wrapper"), { x: 32, opacity: 0, duration: 1.15 });
-  const mobile = gsap.matchMedia();
-  mobile.add("(max-width: 1023px)", () => {
-    gsap.utils
-      .toArray<HTMLElement>(".project-panel")
-      .forEach((panel) => enter(panel, { y: 40, opacity: 0 }));
-  });
-  const media = gsap.matchMedia();
-  media.add("(min-width: 1024px)", () => {
-    const rail = document.querySelector<HTMLElement>(".project-rail");
-    const viewport = document.querySelector<HTMLElement>(".project-viewport");
-    if (!rail || !viewport) return;
-    const distance = () => Math.max(0, rail.scrollWidth - viewport.clientWidth);
-    const pan = gsap.to(rail, {
-      x: () => -distance(),
-      ease: "none",
-      scrollTrigger: {
-        id: "project-pan",
-        trigger: "#projects",
-        start: "top top",
-        end: () => `+=${distance()}`,
-        pin: true,
-        scrub: 1,
-        invalidateOnRefresh: true,
-        anticipatePin: 1,
-      },
-    });
-    let focusFrame = 0;
-    const revealFocusedProject = (event: FocusEvent) => {
-      const panel = (event.target as HTMLElement).closest<HTMLElement>(
-        ".project-panel",
-      );
-      const trigger = pan.scrollTrigger;
-      if (!panel || !trigger) return;
-      const bounds = panel.getBoundingClientRect();
-      const visible = viewport.getBoundingClientRect();
-      if (bounds.left < visible.left - 1 || bounds.right > visible.right + 1) {
-        const first = rail.querySelector<HTMLElement>(".project-panel");
-        const offset = Math.min(
-          distance(),
-          panel.offsetLeft - (first?.offsetLeft || 0),
-        );
-        window.scrollTo({
-          top: trigger.start + offset,
-          behavior: "instant",
-        });
-        ScrollTrigger.update();
-        trigger.getTween()?.progress(1);
-      }
-      viewport.scrollLeft = 0;
-      cancelAnimationFrame(focusFrame);
-      focusFrame = requestAnimationFrame(() => {
-        viewport.scrollLeft = 0;
-      });
-    };
-    rail.addEventListener("focusin", revealFocusedProject);
-    return () => {
-      rail.removeEventListener("focusin", revealFocusedProject);
-      cancelAnimationFrame(focusFrame);
-    };
-  });
-  return () => {
-    media.revert();
-    mobile.revert();
-  };
+  enter(find(".project-selector"), { x: -24, opacity: 0 });
+  enter(find(".project-detail"), { y: 30, clipPath: "inset(0 0 100% 0)" });
+  return () => {};
 }
